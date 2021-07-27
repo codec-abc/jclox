@@ -9,7 +9,7 @@ namespace jclox
     public class Scanner
     {
         private readonly string source;
-        private readonly List<Token> tokens = new List<Token>();
+        private readonly List<Token> tokens = new();
 
         private int start = 0;
         private int current = 0;
@@ -20,7 +20,7 @@ namespace jclox
             this.source = source;
         }
 
-        private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
+        private static readonly Dictionary<string, TokenType> keywords = new()
         {
             { "and",    TokenType.AND},
             { "class",  TokenType.CLASS},
@@ -57,7 +57,6 @@ namespace jclox
             tokens.Add(new Token(TokenType.EOF, "", null, line));
             return tokens;
         }
-
 
         private void ScanToken()
         {
@@ -139,7 +138,7 @@ namespace jclox
                 Advance();
             }
 
-            string text = source.Substring(start, current);
+            string text = source.Substring(start, current - start);
 
             if (!keywords.ContainsKey(text)) 
             {
@@ -151,19 +150,19 @@ namespace jclox
             }
         }
 
-        private bool IsAlpha(char c)
+        private static bool IsAlpha(char c)
         {
             return (c >= 'a' && c <= 'z') ||
                    (c >= 'A' && c <= 'Z') ||
                     c == '_';
         }
 
-        private bool IsAlphaNumeric(char c)
+        private static bool IsAlphaNumeric(char c)
         {
             return IsAlpha(c) || IsDigit(c);
         }
 
-        private bool IsDigit(char c)
+        private static bool IsDigit(char c)
         {
             return c >= '0' && c <= '9';
         }
@@ -190,7 +189,7 @@ namespace jclox
             AddToken
             (
                 TokenType.NUMBER,
-                double.Parse(source.Substring(start, current))
+                double.Parse(source.Substring(start, current - start))
             );
         }
 
@@ -224,7 +223,7 @@ namespace jclox
             Advance();
 
             // Trim the surrounding quotes.
-            string value = source.Substring(start + 1, current - 1);
+            string value = source.Substring(start + 1, current - 1 - (start + 1));
             AddToken(TokenType.STRING, value);
         }
 
@@ -239,7 +238,10 @@ namespace jclox
 
         private bool Match(char expected)
         {
-            if (IsAtEnd()) return false;
+            if (IsAtEnd())
+            {
+                return false;
+            }
             if (source[current] != expected) 
             {
                 return false;
@@ -261,7 +263,7 @@ namespace jclox
 
         private void AddToken(TokenType type, Object literal)
         {
-            string text = source.Substring(start, current);
+            string text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
     }

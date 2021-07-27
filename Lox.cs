@@ -5,14 +5,21 @@ namespace jclox
 {
     class Lox
     {
+        static bool hadError = false;
+
         public static int Main(String[] args)
         {
-            if (args.Length > 1) {
+            if (args.Length > 1) 
+            {
                 Console.WriteLine("Usage: jlox [script]");
                 return 64;
-            } else if (args.Length == 1) {
+            } 
+            else if (args.Length == 1) 
+            {
                 RunFile(args[0]);
-            } else {
+            } 
+            else 
+            {
                 RunPrompt();
             }
 
@@ -27,7 +34,8 @@ namespace jclox
 
         private static void RunPrompt()
         {
-            for (;;) {
+            for (;;) 
+            {
                 Console.WriteLine("> ");
                 string line = Console.ReadLine();
                 if (line == null)
@@ -45,9 +53,8 @@ namespace jclox
             Report(line, "", message);
         }
 
-        static bool hadError = false;
-
-        private static void Report(
+        private static void Report
+        (
             int line, 
             String where,
             String message

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "jclox": {
+      "commandName": "Project",
+      "commandLineArgs": "examples\\HelloWorld.lox",
+      "workingDirectory": "Q:\\dev2\\craftingInterpreter\\jclox"
+    }
+  }
+}
