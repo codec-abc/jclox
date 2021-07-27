@@ -126,7 +126,6 @@ namespace jclox
                     {
                         Lox.Error(line, "Unexpected character.");
                     }
-                    Lox.Error(line, "Unexpected character.");
                     break;
             }
         }
