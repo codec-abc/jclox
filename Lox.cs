@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace jclox
 {
-    class Program
+    class Lox
     {
         public static int Main(String[] args)
         {
@@ -40,7 +40,7 @@ namespace jclox
             }
         }
 
-        static void Error(int line, String message)
+        public static void Error(int line, String message)
         {
             Report(line, "", message);
         }
