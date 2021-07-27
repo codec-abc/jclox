@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace jclox
 {
-    enum TokenType
+    public enum TokenType
     {
         // Single-character tokens.
         LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -28,14 +28,14 @@ namespace jclox
         EOF
     }
 
-    class Token
+    public class Token
     {
-        TokenType type;
-        string lexeme;
-        Object literal;
-        int line;
+        readonly TokenType type;
+        readonly string lexeme;
+        readonly Object literal;
+        readonly int line;
 
-        Token(TokenType type, String lexeme, Object literal, int line)
+        public Token(TokenType type, string lexeme, Object literal, int line)
         {
             this.type = type;
             this.lexeme = lexeme;
