@@ -8,7 +8,7 @@ namespace jclox
 {
     class AstPrinter : Visitor<string>
     {
-        string Print(Expr<string> expr)
+        public string Print(Expr<string> expr)
         {
             return expr.Accept(this);
         }

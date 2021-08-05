@@ -9,24 +9,37 @@ namespace jclox
 
         public static int Main(String[] args)
         {
-            if (args.Length > 1) 
-            {
-                Console.WriteLine("Usage: jlox [script]");
-                return 64;
-            } 
-            else if (args.Length == 1) 
-            {
-                RunFile(args[0]);
-            } 
-            else 
-            {
-                RunPrompt();
-            }
+            //if (args.Length > 1) 
+            //{
+            //    Console.WriteLine("Usage: jlox [script]");
+            //    return 64;
+            //} 
+            //else if (args.Length == 1) 
+            //{
+            //    RunFile(args[0]);
+            //} 
+            //else 
+            //{
+            //    RunPrompt();
+            //}
+
+            Expr<string> expression = new Binary<string>(
+                new Unary<string>(
+                    new Token(TokenType.MINUS, "-", null, 1),
+                    new Literal<string>(123)
+                ),
+                new Token(TokenType.STAR, "*", null, 1),
+                new Grouping<string>(
+                    new Literal<string>(45.67)
+                )
+            );
+
+            Console.WriteLine(new AstPrinter().Print(expression));
 
             return 0;
         }
 
-        private static void RunFile(String path) 
+        private static void RunFile(String path)
         {
             var text = System.IO.File.ReadAllText(path);
             Run(text);
@@ -34,7 +47,7 @@ namespace jclox
 
         private static void RunPrompt()
         {
-            for (;;) 
+            for (; ; )
             {
                 Console.WriteLine("> ");
                 string line = Console.ReadLine();
@@ -55,7 +68,7 @@ namespace jclox
 
         private static void Report
         (
-            int line, 
+            int line,
             String where,
             String message
         )
@@ -73,7 +86,7 @@ namespace jclox
             List<Token> tokens = scanner.ScanTokens();
 
             // For now, just print the tokens.
-            foreach(var token in tokens)
+            foreach (var token in tokens)
             {
                 Console.WriteLine(token);
             }

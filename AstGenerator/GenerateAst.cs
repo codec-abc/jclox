@@ -79,7 +79,7 @@ namespace AstGenerator
                 baseName + "<R> {");
 
             // Constructor.
-            writer.AppendLine("    " + className + "(" + fieldList + ") {");
+            writer.AppendLine("    public " + className + "(" + fieldList + ") {");
 
             // Store parameters in fields.
             string[] fields = fieldList.Split(", ");

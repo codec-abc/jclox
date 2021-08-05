@@ -13,7 +13,7 @@ public interface Visitor<R> {
   }
 
 public class Binary<R> : Expr<R> {
-    Binary(Expr<R> left, Token operatorToken, Expr<R> right) {
+    public Binary(Expr<R> left, Token operatorToken, Expr<R> right) {
         this.left = left;
         this.operatorToken = operatorToken;
         this.right = right;
@@ -29,7 +29,7 @@ public class Binary<R> : Expr<R> {
   }
 
 public class Grouping<R> : Expr<R> {
-    Grouping(Expr<R> expression) {
+    public Grouping(Expr<R> expression) {
         this.expression = expression;
     }
 
@@ -41,7 +41,7 @@ public class Grouping<R> : Expr<R> {
   }
 
 public class Literal<R> : Expr<R> {
-    Literal(object value) {
+    public Literal(object value) {
         this.value = value;
     }
 
@@ -53,7 +53,7 @@ public class Literal<R> : Expr<R> {
   }
 
 public class Unary<R> : Expr<R> {
-    Unary(Token operatorToken, Expr<R> right) {
+    public Unary(Token operatorToken, Expr<R> right) {
         this.operatorToken = operatorToken;
         this.right = right;
     }
