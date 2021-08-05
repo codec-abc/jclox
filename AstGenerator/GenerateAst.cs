@@ -19,10 +19,10 @@ namespace AstGenerator
             DefineAst
             (
                 outputDir, "Expr", new List<string> {
-                  "Binary   : Expr left, Token operatorToken, Expr right",
-                  "Grouping : Expr expression",
+                  "Binary   : Expr<R> left, Token operatorToken, Expr<R> right",
+                  "Grouping : Expr<R> expression",
                   "Literal  : object value",
-                  "Unary    : Token operatorToken, Expr right"
+                  "Unary    : Token operatorToken, Expr<R> right"
                 }
             );
 
@@ -43,15 +43,17 @@ namespace AstGenerator
 
             //writer.Append("namespace com.craftinginterpreters.lox;" + "\n");
             //writer.Append("\n");
+            writer.AppendLine("using jclox;");
             writer.AppendLine("using System.Collections.Generic;");
             writer.AppendLine("");
-            writer.AppendLine("abstract class " + baseName + " {");
+            writer.AppendLine("public abstract class " + baseName + "<R> {");
+            writer.AppendLine("    public abstract R Accept(Visitor<R> visitor);");
+            writer.AppendLine("}");
+            writer.AppendLine("");
 
             DefineVisitor(writer, baseName, types);
 
-            writer.AppendLine("}");
-
-            foreach(var type in types)
+            foreach (var type in types)
             {
                 string className = type.Split(":")[0].Trim();
                 string fields = type.Split(":")[1].Trim();
@@ -73,8 +75,8 @@ namespace AstGenerator
             string fieldList
         )
         {
-            writer.AppendLine("  class " + className + "<R> : " +
-                baseName + " {");
+            writer.AppendLine("public class " + className + "<R> : " +
+                baseName + "<R> {");
 
             // Constructor.
             writer.AppendLine("    " + className + "(" + fieldList + ") {");
@@ -84,7 +86,7 @@ namespace AstGenerator
             foreach (var field in fields)
             {
                 string name = field.Split(" ")[1];
-                writer.AppendLine("      this." + name + " = " + name + ";");
+                writer.AppendLine("        this." + name + " = " + name + ";");
             }
 
             writer.AppendLine("    }");
@@ -93,8 +95,8 @@ namespace AstGenerator
             writer.AppendLine();
             //writer.AppendLine("    @Override");
             //writer.AppendLine("    <R> R accept(Visitor<R> visitor) {");
-            writer.AppendLine("    R accept(Visitor<R> visitor) {");
-            writer.AppendLine("      return visitor.visit" +
+            writer.AppendLine("    public override R Accept(Visitor<R> visitor) {");
+            writer.AppendLine("        return visitor.Visit" +
                 className + baseName + "(this);");
             writer.AppendLine("    }");
 
@@ -106,6 +108,7 @@ namespace AstGenerator
             }
 
             writer.AppendLine("  }");
+            writer.AppendLine("");
         }
 
         private static void DefineVisitor
@@ -115,16 +118,17 @@ namespace AstGenerator
             List<string> types
         )
         {
-            writer.AppendLine("  public interface Visitor<R> {");
+            writer.AppendLine("public interface Visitor<R> {");
 
             foreach (var type in types)
             {
                 string typeName = type.Split(":")[0].Trim();
-                writer.AppendLine("    R visit" + typeName + baseName + "(" +
+                writer.AppendLine("    R Visit" + typeName + baseName + "<R>(" +
                     typeName + "<R> " + baseName.ToLower() + ");");
             }
 
             writer.AppendLine("  }");
+            writer.AppendLine("");
         }
     }
 }
