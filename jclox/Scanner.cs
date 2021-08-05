@@ -260,7 +260,7 @@ namespace jclox
             AddToken(type, null);
         }
 
-        private void AddToken(TokenType type, Object literal)
+        private void AddToken(TokenType type, object literal)
         {
             string text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));

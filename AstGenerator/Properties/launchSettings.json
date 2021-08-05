@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AstGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "./"
+    }
+  }
+}
