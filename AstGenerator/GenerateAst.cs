@@ -19,10 +19,10 @@ namespace AstGenerator
             DefineAst
             (
                 outputDir, "Expr", new List<string> {
-                  "Binary   : Expr left, Token operator, Expr right",
+                  "Binary   : Expr left, Token operatorToken, Expr right",
                   "Grouping : Expr expression",
-                  "Literal  : Object value",
-                  "Unary    : Token operator, Expr right"
+                  "Literal  : object value",
+                  "Unary    : Token operatorToken, Expr right"
                 }
             );
 
@@ -59,8 +59,8 @@ namespace AstGenerator
             }
 
             // The base accept() method.
-            writer.AppendLine();
-            writer.AppendLine("  abstract <R> R accept(Visitor<R> visitor);");
+            //writer.AppendLine();
+            //writer.AppendLine("  abstract <R> R accept(Visitor<R> visitor);");
 
             System.IO.File.WriteAllText(path, writer.ToString());
         }
@@ -73,7 +73,7 @@ namespace AstGenerator
             string fieldList
         )
         {
-            writer.AppendLine("  static class " + className + " extends " +
+            writer.AppendLine("  class " + className + "<R> : " +
                 baseName + " {");
 
             // Constructor.
@@ -91,8 +91,9 @@ namespace AstGenerator
 
             // Visitor pattern.
             writer.AppendLine();
-            writer.AppendLine("    @Override");
-            writer.AppendLine("    <R> R accept(Visitor<R> visitor) {");
+            //writer.AppendLine("    @Override");
+            //writer.AppendLine("    <R> R accept(Visitor<R> visitor) {");
+            writer.AppendLine("    R accept(Visitor<R> visitor) {");
             writer.AppendLine("      return visitor.visit" +
                 className + baseName + "(this);");
             writer.AppendLine("    }");
@@ -101,7 +102,7 @@ namespace AstGenerator
             writer.AppendLine();
             foreach (var field in fields)
             {
-                writer.AppendLine("    final " + field + ";");
+                writer.AppendLine("    readonly " + field + ";");
             }
 
             writer.AppendLine("  }");
@@ -114,13 +115,13 @@ namespace AstGenerator
             List<string> types
         )
         {
-            writer.AppendLine("  interface Visitor<R> {");
+            writer.AppendLine("  public interface Visitor<R> {");
 
             foreach (var type in types)
             {
                 string typeName = type.Split(":")[0].Trim();
                 writer.AppendLine("    R visit" + typeName + baseName + "(" +
-                    typeName + " " + baseName.ToLower() + ");");
+                    typeName + "<R> " + baseName.ToLower() + ");");
             }
 
             writer.AppendLine("  }");
