@@ -6,10 +6,10 @@ public abstract class Expr<R> {
 }
 
 public interface Visitor<R> {
-    R VisitBinaryExpr<R>(Binary<R> expr);
-    R VisitGroupingExpr<R>(Grouping<R> expr);
-    R VisitLiteralExpr<R>(Literal<R> expr);
-    R VisitUnaryExpr<R>(Unary<R> expr);
+    R VisitBinaryExpr(Binary<R> expr);
+    R VisitGroupingExpr(Grouping<R> expr);
+    R VisitLiteralExpr(Literal<R> expr);
+    R VisitUnaryExpr(Unary<R> expr);
   }
 
 public class Binary<R> : Expr<R> {
@@ -23,9 +23,9 @@ public class Binary<R> : Expr<R> {
         return visitor.VisitBinaryExpr(this);
     }
 
-    readonly Expr<R> left;
-    readonly Token operatorToken;
-    readonly Expr<R> right;
+    public readonly Expr<R> left;
+    public readonly Token operatorToken;
+    public readonly Expr<R> right;
   }
 
 public class Grouping<R> : Expr<R> {
@@ -37,7 +37,7 @@ public class Grouping<R> : Expr<R> {
         return visitor.VisitGroupingExpr(this);
     }
 
-    readonly Expr<R> expression;
+    public readonly Expr<R> expression;
   }
 
 public class Literal<R> : Expr<R> {
@@ -49,7 +49,7 @@ public class Literal<R> : Expr<R> {
         return visitor.VisitLiteralExpr(this);
     }
 
-    readonly object value;
+    public readonly object value;
   }
 
 public class Unary<R> : Expr<R> {
@@ -62,7 +62,7 @@ public class Unary<R> : Expr<R> {
         return visitor.VisitUnaryExpr(this);
     }
 
-    readonly Token operatorToken;
-    readonly Expr<R> right;
+    public readonly Token operatorToken;
+    public readonly Expr<R> right;
   }
 

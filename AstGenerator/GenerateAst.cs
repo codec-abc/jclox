@@ -104,7 +104,7 @@ namespace AstGenerator
             writer.AppendLine();
             foreach (var field in fields)
             {
-                writer.AppendLine("    readonly " + field + ";");
+                writer.AppendLine("    public readonly " + field + ";");
             }
 
             writer.AppendLine("  }");
@@ -123,7 +123,7 @@ namespace AstGenerator
             foreach (var type in types)
             {
                 string typeName = type.Split(":")[0].Trim();
-                writer.AppendLine("    R Visit" + typeName + baseName + "<R>(" +
+                writer.AppendLine("    R Visit" + typeName + baseName + "(" +
                     typeName + "<R> " + baseName.ToLower() + ");");
             }
 

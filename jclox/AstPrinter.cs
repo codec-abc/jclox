@@ -10,31 +10,44 @@ namespace jclox
     {
         string Print(Expr<string> expr)
         {
-            return expr.accept(this);
+            return expr.Accept(this);
         }
 
-
-
-        public string visitBinaryExpr(Binary<string> expr)
+        public string VisitBinaryExpr(Binary<string> expr)
         {
-            return parenthesize(expr.operatorToken.lexeme,
-                    expr.left, expr.right);
+            return Parenthesize(expr.operatorToken.lexeme, new Expr<string>[] {
+                    expr.left, expr.right });
         }
 
-        public string visitGroupingExpr(Grouping<string> expr)
+        public string VisitGroupingExpr(Grouping<string> expr)
         {
-            return parenthesize("group", expr.expression);
+            return Parenthesize("group", new Expr<string>[] { expr.expression });
         }
 
-        public string visitLiteralExpr(Literal<string> expr)
+        public string VisitLiteralExpr(Literal<string> expr)
         {
             if (expr.value == null) return "nil";
-            return expr.value.toString();
+            return expr.value.ToString();
         }
 
-        public string visitUnaryExpr(Unary<string> expr)
+        public string VisitUnaryExpr(Unary<string> expr)
         {
-            return parenthesize(expr.operator.lexeme, expr.right);
+            return Parenthesize(expr.operatorToken.lexeme, new Expr<string>[] { expr.right });
+        }
+
+        private string Parenthesize(string name, Expr<string>[] exprs)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("(").Append(name);
+            foreach (var expr in exprs)
+            {
+                builder.Append(" ");
+                builder.Append(expr.Accept(this));
+            }
+            builder.Append(")");
+
+            return builder.ToString();
         }
     }
 }
