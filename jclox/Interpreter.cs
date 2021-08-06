@@ -234,5 +234,43 @@ namespace jclox
                 this.environment = previous;
             }
         }
+
+        public object VisitIfStmt(If<object> stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.condition)))
+            {
+                Execute(stmt.thenBranch);
+            }
+            else if (stmt.elseBranch != null)
+            {
+                Execute(stmt.elseBranch);
+            }
+            return null;
+        }
+
+        public object VisitLogicalExpr(Logical<object> expr)
+        {
+            object left = Evaluate(expr.left);
+
+            if (expr.operatorToken.type == TokenType.OR) 
+            {
+                if (IsTruthy(left)) return left;
+            } 
+            else
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.right);
+        }
+
+        public object VisitWhileStmt(While<object> stmt)
+        {
+            while (IsTruthy(Evaluate(stmt.condition)))
+            {
+                Execute(stmt.body);
+            }
+            return null;
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace jclox
 
         private Expr<R> Assignment()
         {
-            Expr<R> expr = Equality();
+            Expr<R> expr = Or();
 
             if (Match(new TokenType[] { TokenType.EQUAL }))
             {
@@ -47,6 +47,34 @@ namespace jclox
                 }
 
                 Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
+        }
+
+        private Expr<R> Or()
+        {
+            Expr<R> expr = And();
+
+            while (Match(new TokenType[] { TokenType.OR }))
+            {
+                Token operatorToken = Previous();
+                Expr<R> right = And();
+                expr = new Logical<R>(expr, operatorToken, right);
+            }
+
+            return expr;
+        }
+
+        private Expr<R> And()
+        {
+            Expr<R> expr = Equality();
+
+            while (Match(new TokenType[] { TokenType.AND } ))
+            {
+                Token operatorToken = Previous();
+                Expr<R> right = Equality();
+                expr = new Logical<R>(expr, operatorToken, right);
             }
 
             return expr;
@@ -86,9 +114,24 @@ namespace jclox
 
         private Stmt<R> Statement()
         {
+            if (Match(new TokenType[] { TokenType.FOR }))
+            {
+                return ForStatement();
+            }
+
+            if (Match(new TokenType[] { TokenType.IF }))
+            {
+                return IfStatement();
+            }
+
             if (Match(new TokenType[] { TokenType.PRINT }))
             {
                 return PrintStatement();
+            }
+
+            if (Match(new TokenType[] { TokenType.WHILE }))
+            {
+                return WhileStatement();
             }
 
             if (Match(new TokenType[] { TokenType.LEFT_BRACE } ))
@@ -97,6 +140,95 @@ namespace jclox
             }
 
             return ExpressionStatement();
+        }
+
+        private Stmt<R> ForStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+            Stmt<R> initializer;
+            if (Match(new TokenType[] { TokenType.SEMICOLON }))
+            {
+                initializer = null;
+            }
+            else if (Match(new TokenType[] { TokenType.VAR }))
+            {
+                initializer = VarDeclaration();
+            }
+            else
+            {
+                initializer = ExpressionStatement();
+            }
+
+            Expr<R> condition = null;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                condition = Expression();
+            }
+            Consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+            Expr<R> increment = null;
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                increment = Expression();
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+            Stmt<R> body = Statement();
+
+            if (increment != null)
+            {
+                body = 
+                    new Block<R>
+                    (
+                        new List<Stmt<R>>() 
+                        {
+                            body,
+                            new Expression<R>(increment)
+                        }
+                    );
+            }
+
+            if (condition == null) 
+            { 
+                condition = new Literal<R>(true); 
+            }
+
+            body = new While<R>(condition, body);
+
+            if (initializer != null)
+            {
+                body = new Block<R>(new List<Stmt<R>> { initializer, body });
+            }
+
+            return body;
+        }
+
+        private Stmt<R> WhileStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+            Expr<R> condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+            Stmt<R> body = Statement();
+
+            return new While<R>(condition, body);
+        }
+
+        private Stmt<R> IfStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+            Expr<R> condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+            Stmt<R> thenBranch = Statement();
+            Stmt<R> elseBranch = null;
+
+            if (Match(new TokenType[] { TokenType.ELSE }))
+            {
+                elseBranch = Statement();
+            }
+
+            return new If<R>(condition, thenBranch, elseBranch);
         }
 
         private List<Stmt<R>> Block()

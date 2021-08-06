@@ -35,6 +35,11 @@ namespace jclox
             return expr.value.ToString();
         }
 
+        public string VisitLogicalExpr(Logical<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitUnaryExpr(Unary<string> expr)
         {
             return Parenthesize(expr.operatorToken.lexeme, new Expr<string>[] { expr.right });

@@ -23,6 +23,7 @@ namespace AstGenerator
                   "Binary   : Expr<R> left, Token operatorToken, Expr<R> right",
                   "Grouping : Expr<R> expression",
                   "Literal  : object value",
+                  "Logical  : Expr<R> left, Token operatorToken, Expr<R> right",
                   "Unary    : Token operatorToken, Expr<R> right",
                   "Variable : Token name"
                 }
@@ -34,8 +35,10 @@ namespace AstGenerator
                 new List<string> {
                     "Block      : List<Stmt<R>> statements",
                     "Expression : Expr<R> expression",
+                    "If         : Expr<R> condition, Stmt<R> thenBranch, Stmt<R> elseBranch",
                     "Print      : Expr<R> expression",
-                    "Var        : Token name, Expr<R> initializer"
+                    "Var        : Token name, Expr<R> initializer",
+                    "While      : Expr<R> condition, Stmt<R> body"
                 }
             );
 
