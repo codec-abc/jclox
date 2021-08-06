@@ -21,6 +21,7 @@ namespace AstGenerator
                 outputDir, "Expr", new List<string> {
                   "Assign   : Token name, Expr<R> value",
                   "Binary   : Expr<R> left, Token operatorToken, Expr<R> right",
+                  "Call     : Expr<R> callee, Token paren, List<Expr<R>> arguments",
                   "Grouping : Expr<R> expression",
                   "Literal  : object value",
                   "Logical  : Expr<R> left, Token operatorToken, Expr<R> right",
@@ -35,8 +36,10 @@ namespace AstGenerator
                 new List<string> {
                     "Block      : List<Stmt<R>> statements",
                     "Expression : Expr<R> expression",
+                    "Function   : Token name, List<Token> funcParams, List<Stmt<R>> body",
                     "If         : Expr<R> condition, Stmt<R> thenBranch, Stmt<R> elseBranch",
                     "Print      : Expr<R> expression",
+                    "Return     : Token keyword, Expr<R> value",
                     "Var        : Token name, Expr<R> initializer",
                     "While      : Expr<R> condition, Stmt<R> body"
                 }

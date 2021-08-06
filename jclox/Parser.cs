@@ -84,6 +84,11 @@ namespace jclox
         {
             try
             {
+                if (Match(new TokenType[] { TokenType.FUN }))
+                {
+                    return Function("function");
+                }
+
                 if (Match(new TokenType[] { TokenType.VAR }))
                 {
                     return VarDeclaration();
@@ -96,6 +101,34 @@ namespace jclox
                 Synchronize();
                 return null;
             }
+        }
+
+        private Function<R> Function(string kind)
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+            List<Token> parameters = new List<Token>();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 parameters.");
+                    }
+
+                    parameters.Add
+                    (
+                        Consume(TokenType.IDENTIFIER, "Expect parameter name.")
+                    );
+
+                } while (Match(new TokenType[] { TokenType.COMMA }));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+            List<Stmt<R>> body = Block();
+            return new Function<R>(name, parameters, body);
         }
 
         private Stmt<R> VarDeclaration()
@@ -129,6 +162,11 @@ namespace jclox
                 return PrintStatement();
             }
 
+            if (Match(new TokenType[] { TokenType.RETURN }))
+            {
+                return ReturnStatement();
+            }
+
             if (Match(new TokenType[] { TokenType.WHILE }))
             {
                 return WhileStatement();
@@ -140,6 +178,19 @@ namespace jclox
             }
 
             return ExpressionStatement();
+        }
+
+        private Stmt<R> ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expr<R> value = null;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                value = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+            return new Return<R>(keyword, value);
         }
 
         private Stmt<R> ForStatement()
@@ -323,7 +374,48 @@ namespace jclox
                 return new Unary<R>(operatorToken, right);
             }
 
-            return Primary();
+            return Call();
+        }
+
+        private Expr<R> Call()
+        {
+            Expr<R> expr = Primary();
+
+            while (true)
+            {
+                if (Match(new TokenType[] { TokenType.LEFT_PAREN }))
+                {
+                    expr = FinishCall(expr);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return expr;
+        }
+
+        private Expr<R> FinishCall(Expr<R> callee)
+        {
+            List<Expr<R>> arguments = new List<Expr<R>>();
+
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments.");
+                    }
+
+                    arguments.Add(Expression());
+                } while (Match(new TokenType[] { TokenType.COMMA }));
+            }
+
+            Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+            return new Call<R>(callee, paren, arguments);
         }
 
         private Expr<R> Primary()

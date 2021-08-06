@@ -24,6 +24,11 @@ namespace jclox
                     expr.left, expr.right });
         }
 
+        public string VisitCallExpr(Call<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitGroupingExpr(Grouping<string> expr)
         {
             return Parenthesize("group", new Expr<string>[] { expr.expression });

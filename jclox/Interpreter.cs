@@ -8,7 +8,30 @@ namespace jclox
 {
     public class Interpreter : ExprVisitor<object>, StmtVisitor<object>
     {
-        private Environment environment = new Environment();
+        public readonly Environment globals = new Environment();
+        private Environment environment;
+
+        public Interpreter()
+        {
+            environment = globals;
+
+            globals.Define("clock", new ClockFunction());
+        }
+
+        class ClockFunction : LoxCallable
+        {
+            public int Arity()
+            {
+                return 0;
+            }
+
+            public object Call(Interpreter interpreter, List<object> arguments)
+            {
+                return (double)DateTimeOffset.Now.ToUnixTimeMilliseconds() / 1000.0;
+            }
+
+            public override string ToString() { return "<native fn>"; }
+        }
 
         public object VisitBinaryExpr(Binary<object> expr)
         {
@@ -216,7 +239,7 @@ namespace jclox
             return null;
         }
 
-        void ExecuteBlock(List<Stmt<object>> statements,
+        public void ExecuteBlock(List<Stmt<object>> statements,
                     Environment environment)
         {
             Environment previous = this.environment;
@@ -254,11 +277,17 @@ namespace jclox
 
             if (expr.operatorToken.type == TokenType.OR) 
             {
-                if (IsTruthy(left)) return left;
+                if (IsTruthy(left))
+                {
+                    return left;
+                }
             } 
             else
             {
-                if (!IsTruthy(left)) return left;
+                if (!IsTruthy(left))
+                {
+                    return left;
+                }
             }
 
             return Evaluate(expr.right);
@@ -271,6 +300,49 @@ namespace jclox
                 Execute(stmt.body);
             }
             return null;
+        }
+
+        public object VisitCallExpr(Call<object> expr)
+        {
+            object callee = Evaluate(expr.callee);
+
+            List<object> arguments = new List<object>();
+            foreach (Expr<object> argument in expr.arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            if (!(callee is LoxCallable)) 
+            {
+                throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            }
+
+            LoxCallable function = (LoxCallable)callee;
+
+            if (arguments.Count != function.Arity())
+            {
+                throw new RuntimeError(expr.paren, "Expected " + function.Arity() + " arguments but got " + arguments.Count + ".");
+            }
+
+            return function.Call(this, arguments);
+        }
+
+        public object VisitFunctionStmt(Function<object> stmt)
+        {
+            LoxFunction function = new LoxFunction(stmt, environment);
+            environment.Define(stmt.name.lexeme, function);
+            return null;
+        }
+
+        public object VisitReturnStmt(Return<object> stmt)
+        {
+            object value = null;
+            if (stmt.value != null)
+            {
+                value = Evaluate(stmt.value);
+            }
+
+            throw new Return(value);
         }
     }
 }
