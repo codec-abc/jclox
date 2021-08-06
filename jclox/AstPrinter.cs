@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace jclox
 {
-    class AstPrinter : Visitor<string>
+    class AstPrinter : ExprVisitor<string>
     {
         public string Print(Expr<string> expr)
         {
             return expr.Accept(this);
+        }
+
+        public string VisitAssignExpr(Assign<string> expr)
+        {
+            return Parenthesize(expr.name.lexeme, new Expr<string>[] { expr.value });
         }
 
         public string VisitBinaryExpr(Binary<string> expr)
@@ -33,6 +38,11 @@ namespace jclox
         public string VisitUnaryExpr(Unary<string> expr)
         {
             return Parenthesize(expr.operatorToken.lexeme, new Expr<string>[] { expr.right });
+        }
+
+        public string VisitVariableExpr(Variable<string> expr)
+        {
+            return "(var " + expr.name + ")"; 
         }
 
         private string Parenthesize(string name, Expr<string>[] exprs)

@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace jclox
 {
-    public class Interpreter : Visitor<object>
+    public class Interpreter : ExprVisitor<object>, StmtVisitor<object>
     {
+        private Environment environment = new Environment();
+
         public object VisitBinaryExpr(Binary<object> expr)
         {
             object left = Evaluate(expr.left);
@@ -131,17 +133,24 @@ namespace jclox
             return expr.Accept(this);
         }
 
-        public void Interpret(Expr<object> expression)
+        public void Interpret(List<Stmt<object>> statements)
         {
             try
             {
-                object value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeError error)
             {
                 Lox.RuntimeError(error);
             }
+        }
+
+        private void Execute(Stmt<object> stmt)
+        {
+            stmt.Accept(this);
         }
 
         private string Stringify(object obj)
@@ -162,6 +171,68 @@ namespace jclox
             }
 
             return obj.ToString();
+        }
+
+        public object VisitExpressionStmt(Expression<object> stmt)
+        {
+            Evaluate(stmt.expression);
+            return null;
+        }
+
+        public object VisitPrintStmt(Print<object> stmt)
+        {
+            object value = Evaluate(stmt.expression);
+            Console.WriteLine(Stringify(value));
+            return null;
+        }
+
+        public object VisitVarStmt(Var<object> stmt)
+        {
+            object value = null;
+            if (stmt.initializer != null)
+            {
+                value = Evaluate(stmt.initializer);
+            }
+
+            environment.Define(stmt.name.lexeme, value);
+            return null;
+        }
+
+        public object VisitVariableExpr(Variable<object> expr)
+        {
+            return environment.Get(expr.name);
+        }
+
+        public object VisitAssignExpr(Assign<object> expr)
+        {
+            object value = Evaluate(expr.value);
+            environment.Assign(expr.name, value);
+            return value;
+        }
+
+        public object VisitBlockStmt(Block<object> stmt)
+        {
+            ExecuteBlock(stmt.statements, new Environment(environment));
+            return null;
+        }
+
+        void ExecuteBlock(List<Stmt<object>> statements,
+                    Environment environment)
+        {
+            Environment previous = this.environment;
+            try
+            {
+                this.environment = environment;
+
+                foreach (Stmt<object> statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
         }
     }
 }

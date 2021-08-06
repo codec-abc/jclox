@@ -1,1 +1,1 @@
-dotnet run 
+dotnet run ..\tests\test1.jclox

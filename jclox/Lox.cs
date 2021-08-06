@@ -48,12 +48,12 @@ namespace jclox
 
             if (hadError)
             {
-                Environment.Exit(65);
+                System.Environment.Exit(65);
             }
 
             if (hadRuntimeError)
             {
-                Environment.Exit(70);
+                System.Environment.Exit(70);
             }
 
         }
@@ -99,7 +99,7 @@ namespace jclox
             List<Token> tokens = scanner.ScanTokens();
 
             Parser<object> parser = new Parser<object>(tokens);
-            Expr<object> expression = parser.Parse();
+            List<Stmt<object>> statements = parser.Parse();
 
             // Stop if there was a syntax error.
             if (hadError)
@@ -107,7 +107,7 @@ namespace jclox
                 return;
             }
 
-            interpreter.Interpret(expression);
+            interpreter.Interpret(statements);
 
         }
 

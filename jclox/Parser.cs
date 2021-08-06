@@ -16,21 +16,114 @@ namespace jclox
             this.tokens = tokens;
         }
 
-        public Expr<R> Parse()
+        public List<Stmt<R>> Parse()
         {
-            try
+            var statements = new List<Stmt<R>>();
+            while (!IsAtEnd())
             {
-                return Expression();
+                statements.Add(Declaration());
             }
-            catch (ParseError error)
-            {
-                return null;
-            }
+
+            return statements;
         }
 
         private Expr<R> Expression()
         {
-            return Equality();
+            return Assignment();
+        }
+
+        private Expr<R> Assignment()
+        {
+            Expr<R> expr = Equality();
+
+            if (Match(new TokenType[] { TokenType.EQUAL }))
+            {
+                Token equals = Previous();
+                Expr<R> value = Assignment();
+
+                if (expr is Variable<R>) {
+                    Token name = ((Variable<R>)expr).name;
+                    return new Assign<R>(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
+        }
+
+        private Stmt<R> Declaration()
+        {
+            try
+            {
+                if (Match(new TokenType[] { TokenType.VAR }))
+                {
+                    return VarDeclaration();
+                }
+
+                return Statement();
+            }
+            catch (ParseError error)
+            {
+                Synchronize();
+                return null;
+            }
+        }
+
+        private Stmt<R> VarDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+            Expr<R> initializer = null;
+            if (Match(new TokenType[] { TokenType.EQUAL }))
+            {
+                initializer = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new Var<R>(name, initializer);
+        }
+
+        private Stmt<R> Statement()
+        {
+            if (Match(new TokenType[] { TokenType.PRINT }))
+            {
+                return PrintStatement();
+            }
+
+            if (Match(new TokenType[] { TokenType.LEFT_BRACE } ))
+            {
+                return new Block<R>(Block());
+            }
+
+            return ExpressionStatement();
+        }
+
+        private List<Stmt<R>> Block()
+        {
+            List<Stmt<R>> statements = new List<Stmt<R>>();
+
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
+
+        private Stmt<R> PrintStatement()
+        {
+            Expr<R> value = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new Print<R>(value);
+        }
+
+        private Stmt<R> ExpressionStatement()
+        {
+            Expr<R> expr = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+            return new Expression<R>(expr);
         }
 
         private Expr<R> Equality()
@@ -110,6 +203,11 @@ namespace jclox
             if (Match(new TokenType[] { TokenType.NUMBER, TokenType.STRING }))
             {
                 return new Literal<R>(Previous().literal);
+            }
+
+            if (Match(new TokenType[] { TokenType.IDENTIFIER }))
+            {
+                return new Variable<R>(Previous());
             }
 
             if (Match(new TokenType[] { TokenType.LEFT_PAREN }))

@@ -19,10 +19,23 @@ namespace AstGenerator
             DefineAst
             (
                 outputDir, "Expr", new List<string> {
+                  "Assign   : Token name, Expr<R> value",
                   "Binary   : Expr<R> left, Token operatorToken, Expr<R> right",
                   "Grouping : Expr<R> expression",
                   "Literal  : object value",
-                  "Unary    : Token operatorToken, Expr<R> right"
+                  "Unary    : Token operatorToken, Expr<R> right",
+                  "Variable : Token name"
+                }
+            );
+
+            DefineAst(
+                outputDir, 
+                "Stmt", 
+                new List<string> {
+                    "Block      : List<Stmt<R>> statements",
+                    "Expression : Expr<R> expression",
+                    "Print      : Expr<R> expression",
+                    "Var        : Token name, Expr<R> initializer"
                 }
             );
 
@@ -47,7 +60,7 @@ namespace AstGenerator
             writer.AppendLine("using System.Collections.Generic;");
             writer.AppendLine("");
             writer.AppendLine("public abstract class " + baseName + "<R> {");
-            writer.AppendLine("    public abstract R Accept(Visitor<R> visitor);");
+            writer.AppendLine("    public abstract R Accept(" + baseName + "Visitor<R> visitor);");
             writer.AppendLine("}");
             writer.AppendLine("");
 
@@ -69,9 +82,9 @@ namespace AstGenerator
 
         private static void DefineType
         (
-            StringBuilder writer, 
+            StringBuilder writer,
             string baseName,
-            string className, 
+            string className,
             string fieldList
         )
         {
@@ -95,7 +108,7 @@ namespace AstGenerator
             writer.AppendLine();
             //writer.AppendLine("    @Override");
             //writer.AppendLine("    <R> R accept(Visitor<R> visitor) {");
-            writer.AppendLine("    public override R Accept(Visitor<R> visitor) {");
+            writer.AppendLine("    public override R Accept(" + baseName + "Visitor<R> visitor) {");
             writer.AppendLine("        return visitor.Visit" +
                 className + baseName + "(this);");
             writer.AppendLine("    }");
@@ -113,12 +126,12 @@ namespace AstGenerator
 
         private static void DefineVisitor
         (
-            StringBuilder writer, 
+            StringBuilder writer,
             string baseName,
             List<string> types
         )
         {
-            writer.AppendLine("public interface Visitor<R> {");
+            writer.AppendLine("public interface " + baseName + "Visitor<R> {");
 
             foreach (var type in types)
             {

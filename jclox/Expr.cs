@@ -2,14 +2,30 @@ using jclox;
 using System.Collections.Generic;
 
 public abstract class Expr<R> {
-    public abstract R Accept(Visitor<R> visitor);
+    public abstract R Accept(ExprVisitor<R> visitor);
 }
 
-public interface Visitor<R> {
+public interface ExprVisitor<R> {
+    R VisitAssignExpr(Assign<R> expr);
     R VisitBinaryExpr(Binary<R> expr);
     R VisitGroupingExpr(Grouping<R> expr);
     R VisitLiteralExpr(Literal<R> expr);
     R VisitUnaryExpr(Unary<R> expr);
+    R VisitVariableExpr(Variable<R> expr);
+  }
+
+public class Assign<R> : Expr<R> {
+    public Assign(Token name, Expr<R> value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitAssignExpr(this);
+    }
+
+    public readonly Token name;
+    public readonly Expr<R> value;
   }
 
 public class Binary<R> : Expr<R> {
@@ -19,7 +35,7 @@ public class Binary<R> : Expr<R> {
         this.right = right;
     }
 
-    public override R Accept(Visitor<R> visitor) {
+    public override R Accept(ExprVisitor<R> visitor) {
         return visitor.VisitBinaryExpr(this);
     }
 
@@ -33,7 +49,7 @@ public class Grouping<R> : Expr<R> {
         this.expression = expression;
     }
 
-    public override R Accept(Visitor<R> visitor) {
+    public override R Accept(ExprVisitor<R> visitor) {
         return visitor.VisitGroupingExpr(this);
     }
 
@@ -45,7 +61,7 @@ public class Literal<R> : Expr<R> {
         this.value = value;
     }
 
-    public override R Accept(Visitor<R> visitor) {
+    public override R Accept(ExprVisitor<R> visitor) {
         return visitor.VisitLiteralExpr(this);
     }
 
@@ -58,11 +74,23 @@ public class Unary<R> : Expr<R> {
         this.right = right;
     }
 
-    public override R Accept(Visitor<R> visitor) {
+    public override R Accept(ExprVisitor<R> visitor) {
         return visitor.VisitUnaryExpr(this);
     }
 
     public readonly Token operatorToken;
     public readonly Expr<R> right;
+  }
+
+public class Variable<R> : Expr<R> {
+    public Variable(Token name) {
+        this.name = name;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitVariableExpr(this);
+    }
+
+    public readonly Token name;
   }
 
