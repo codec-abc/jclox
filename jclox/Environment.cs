@@ -26,6 +26,28 @@ namespace jclox
             values.Add(name, value);
         }
 
+        public object GetAt(int distance, string name)
+        {
+            if (Ancestor(distance).values.ContainsKey(name))
+            {
+                return Ancestor(distance).values[name];
+            } else
+            {
+                return null;
+            }
+        }
+
+        Environment Ancestor(int distance)
+        {
+            Environment environment = this;
+            for (int i = 0; i < distance; i++)
+            {
+                environment = environment.enclosing;
+            }
+
+            return environment;
+        }
+
         public object Get(Token name)
         {
             if (values.ContainsKey(name.lexeme))
@@ -56,6 +78,11 @@ namespace jclox
             }
 
             throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+        }
+
+        public void AssignAt(int distance, Token name, object value)
+        {
+            Ancestor(distance).values.Add(name.lexeme, value);
         }
     }
 }

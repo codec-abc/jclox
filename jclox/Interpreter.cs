@@ -9,6 +9,7 @@ namespace jclox
     public class Interpreter : ExprVisitor<object>, StmtVisitor<object>
     {
         public readonly Environment globals = new Environment();
+        private readonly Dictionary<Expr<object>, int> locals = new Dictionary<Expr<object>, int>();
         private Environment environment;
 
         public Interpreter()
@@ -176,6 +177,11 @@ namespace jclox
             stmt.Accept(this);
         }
 
+        public void Resolve(Expr<object> expr, int depth)
+        {
+            locals.Add(expr, depth);
+        }
+
         private string Stringify(object obj)
         {
             if (obj == null)
@@ -223,13 +229,36 @@ namespace jclox
 
         public object VisitVariableExpr(Variable<object> expr)
         {
-            return environment.Get(expr.name);
+            return LookUpVariable(expr.name, expr);
+        }
+
+        private object LookUpVariable(Token name, Expr<object> expr)
+        {
+            
+            if (locals.ContainsKey(expr))
+            {
+                int distance = locals[expr];
+                return environment.GetAt(distance, name.lexeme);
+            }
+            else
+            {
+                return globals.Get(name);
+            }
         }
 
         public object VisitAssignExpr(Assign<object> expr)
         {
             object value = Evaluate(expr.value);
-            environment.Assign(expr.name, value);
+
+            if (locals.ContainsKey(expr))
+            {
+                int distance = locals[expr];
+                environment.AssignAt(distance, expr.name, value);
+            }
+            else
+            {
+                globals.Assign(expr.name, value);
+            }
             return value;
         }
 
