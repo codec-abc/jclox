@@ -10,9 +10,16 @@ namespace jclox
     {
         private readonly Function<object> declaration;
         private readonly Environment closure;
+        private readonly bool isInitializer;
 
-        public LoxFunction(Function<object> declaration, Environment closure)
+        public LoxFunction
+        (
+            Function<object> declaration, 
+            Environment closure, 
+            bool isInitializer
+        )
         {
+            this.isInitializer = isInitializer;
             this.closure = closure;
             this.declaration = declaration;
         }
@@ -25,8 +32,11 @@ namespace jclox
         public object Call(Interpreter interpreter, List<object> arguments)
         {
             Environment environment = new Environment(closure);
-            for (int i = 0; i < declaration.funcParams.Count; i++) {
-                environment.Define(
+
+            for (int i = 0; i < declaration.funcParams.Count; i++) 
+            {
+                environment.Define
+                (
                     declaration.funcParams[i].lexeme,
                     arguments[i]
                 );
@@ -38,9 +48,25 @@ namespace jclox
             }
             catch (Return returnValue)
             {
+                if (isInitializer) 
+                { 
+                    return closure.GetAt(0, "this"); 
+                }
                 return returnValue.value;
             }
+
+            if (isInitializer) 
+            { 
+                return closure.GetAt(0, "this"); 
+            }
             return null;
+        }
+
+        public LoxFunction Bind(LoxInstance instance)
+        {
+            Environment environment = new Environment(closure);
+            environment.Define("this", instance);
+            return new LoxFunction(declaration, environment, isInitializer);
         }
 
         public override string ToString()

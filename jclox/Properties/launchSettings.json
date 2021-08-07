@@ -2,8 +2,8 @@
   "profiles": {
     "jclox": {
       "commandName": "Project",
-      "commandLineArgs": "test2.jclox",
-      "workingDirectory": "Q:\\dev2\\craftingInterpreter\\jclox\\tests"
+      "commandLineArgs": "ClassMethodCall.lox",
+      "workingDirectory": "Q:\\dev2\\craftingInterpreter\\jclox\\examples\\class"
     }
   }
 }

@@ -357,7 +357,7 @@ namespace jclox
 
         public object VisitFunctionStmt(Function<object> stmt)
         {
-            LoxFunction function = new LoxFunction(stmt, environment);
+            LoxFunction function = new LoxFunction(stmt, environment, false);
             environment.Define(stmt.name.lexeme, function);
             return null;
         }
@@ -371,6 +371,55 @@ namespace jclox
             }
 
             throw new Return(value);
+        }
+
+        public object VisitClassStmt(Class<object> stmt)
+        {
+            environment.Define(stmt.name.lexeme, null);
+
+            Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
+            foreach (Function<object> method in stmt.methods)
+            {
+                LoxFunction function = new LoxFunction(method, environment, method.name.lexeme == "init");
+                methods[method.name.lexeme] = function;
+            }
+
+            LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+
+            environment.Assign(stmt.name, klass);
+            return null;
+        }
+
+        public object VisitGetExpr(Get<object> expr)
+        {
+            object obj = Evaluate(expr.obj);
+            if (obj is LoxInstance) 
+            {
+                LoxInstance loxInstance = ((LoxInstance)obj);
+                return loxInstance.Get(expr.name);
+            }
+
+            throw new RuntimeError(expr.name, "Only instances have properties.");
+        }
+
+        public object VisitSetExpr(Set<object> expr)
+        {
+            object obj = Evaluate(expr.obj);
+
+            if (!(obj is LoxInstance)) 
+            {
+                throw new RuntimeError(expr.name, "Only instances have fields.");
+            }
+
+            object value = Evaluate(expr.value);
+            LoxInstance loxInstane = ((LoxInstance)obj);
+            loxInstane.Set(expr.name, value);
+            return value;
+        }
+
+        public object VisitThisExpr(This<object> expr)
+        {
+            return LookUpVariable(expr.keyword, expr);
         }
     }
 }

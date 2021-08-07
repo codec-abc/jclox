@@ -7,6 +7,7 @@ public abstract class Stmt<R> {
 
 public interface StmtVisitor<R> {
     R VisitBlockStmt(Block<R> stmt);
+    R VisitClassStmt(Class<R> stmt);
     R VisitExpressionStmt(Expression<R> stmt);
     R VisitFunctionStmt(Function<R> stmt);
     R VisitIfStmt(If<R> stmt);
@@ -26,6 +27,20 @@ public class Block<R> : Stmt<R> {
     }
 
     public readonly List<Stmt<R>> statements;
+  }
+
+public class Class<R> : Stmt<R> {
+    public Class(Token name, List<Function<R>> methods) {
+        this.name = name;
+        this.methods = methods;
+    }
+
+    public override R Accept(StmtVisitor<R> visitor) {
+        return visitor.VisitClassStmt(this);
+    }
+
+    public readonly Token name;
+    public readonly List<Function<R>> methods;
   }
 
 public class Expression<R> : Stmt<R> {

@@ -29,6 +29,11 @@ namespace jclox
             throw new NotImplementedException();
         }
 
+        public string VisitGetExpr(Get<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitGroupingExpr(Grouping<string> expr)
         {
             return Parenthesize("group", new Expr<string>[] { expr.expression });
@@ -41,6 +46,16 @@ namespace jclox
         }
 
         public string VisitLogicalExpr(Logical<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitSetExpr(Set<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitThisExpr(This<string> expr)
         {
             throw new NotImplementedException();
         }

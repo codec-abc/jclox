@@ -41,9 +41,15 @@ namespace jclox
                 Token equals = Previous();
                 Expr<R> value = Assignment();
 
-                if (expr is Variable<R>) {
+                if (expr is Variable<R>) 
+                {
                     Token name = ((Variable<R>)expr).name;
                     return new Assign<R>(name, value);
+                }
+                else if (expr is Get<R>) 
+                {
+                    Get<R> get = (Get<R>)expr;
+                    return new Set<R>(get.obj, get.name, value);
                 }
 
                 Error(equals, "Invalid assignment target.");
@@ -84,6 +90,11 @@ namespace jclox
         {
             try
             {
+                if (Match(new TokenType[] { TokenType.CLASS }))
+                {
+                    return ClassDeclaration();
+                }
+
                 if (Match(new TokenType[] { TokenType.FUN }))
                 {
                     return Function("function");
@@ -101,6 +112,22 @@ namespace jclox
                 Synchronize();
                 return null;
             }
+        }
+
+        private Stmt<R> ClassDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+
+            List<Function<R>> methods = new List<Function<R>>();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                methods.Add(Function("method"));
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+
+            return new Class<R>(name, methods);
         }
 
         private Function<R> Function(string kind)
@@ -387,6 +414,11 @@ namespace jclox
                 {
                     expr = FinishCall(expr);
                 }
+                else if (Match(new TokenType[] { TokenType.DOT } ))
+                {
+                    Token name = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                    expr = new Get<R>(expr, name);
+                }
                 else
                 {
                     break;
@@ -420,13 +452,29 @@ namespace jclox
 
         private Expr<R> Primary()
         {
-            if (Match(new TokenType[] { TokenType.FALSE })) return new Literal<R>(false);
-            if (Match(new TokenType[] { TokenType.TRUE })) return new Literal<R>(true);
-            if (Match(new TokenType[] { TokenType.NIL })) return new Literal<R>(null);
+            if (Match(new TokenType[] { TokenType.FALSE })) 
+            { 
+                return new Literal<R>(false); 
+            }
+
+            if (Match(new TokenType[] { TokenType.TRUE })) 
+            { 
+                return new Literal<R>(true); 
+            }
+
+            if (Match(new TokenType[] { TokenType.NIL }))
+            {
+                return new Literal<R>(null);
+            }
 
             if (Match(new TokenType[] { TokenType.NUMBER, TokenType.STRING }))
             {
                 return new Literal<R>(Previous().literal);
+            }
+
+            if (Match(new TokenType[] { TokenType.THIS }))
+            {
+                return new Variable<R>(Previous());
             }
 
             if (Match(new TokenType[] { TokenType.IDENTIFIER }))

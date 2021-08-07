@@ -22,9 +22,12 @@ namespace AstGenerator
                   "Assign   : Token name, Expr<R> value",
                   "Binary   : Expr<R> left, Token operatorToken, Expr<R> right",
                   "Call     : Expr<R> callee, Token paren, List<Expr<R>> arguments",
+                  "Get      : Expr<R> obj, Token name",
                   "Grouping : Expr<R> expression",
                   "Literal  : object value",
                   "Logical  : Expr<R> left, Token operatorToken, Expr<R> right",
+                  "Set      : Expr<R> obj, Token name, Expr<R> value",
+                  "This     : Token keyword",
                   "Unary    : Token operatorToken, Expr<R> right",
                   "Variable : Token name"
                 }
@@ -35,6 +38,7 @@ namespace AstGenerator
                 "Stmt", 
                 new List<string> {
                     "Block      : List<Stmt<R>> statements",
+                    "Class      : Token name, List<Function<R>> methods",
                     "Expression : Expr<R> expression",
                     "Function   : Token name, List<Token> funcParams, List<Stmt<R>> body",
                     "If         : Expr<R> condition, Stmt<R> thenBranch, Stmt<R> elseBranch",

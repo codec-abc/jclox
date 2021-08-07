@@ -19,7 +19,6 @@ dotnet run ..\examples\functions\PrintFunction.lox
 dotnet run ..\examples\functions\PrintResultOfFunctionWithoutReturn.lox
 dotnet run ..\examples\functions\RecursiveFunction.lox
 dotnet run ..\examples\functions\ReturnFromNestedBlocks.lox
-dotnet run ..\examples\logical\operators
 dotnet run ..\examples\logical\operators\IfOperator.lox
 dotnet run ..\examples\logical\operators\LogicalOperators.lox
 dotnet run ..\examples\loops\ForLoop.lox

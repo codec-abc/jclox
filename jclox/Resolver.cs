@@ -15,8 +15,18 @@ namespace jclox
         private enum FunctionType
         {
             NONE,
-            FUNCTION
+            FUNCTION,
+            INITIALIZER,
+            METHOD
         }
+
+        private enum ClassType
+        {
+            NONE,
+            CLASS
+        }
+
+        private ClassType currentClass = ClassType.NONE;
 
         public Resolver(Interpreter interpreter)
         {
@@ -100,6 +110,11 @@ namespace jclox
 
             if (stmt.value != null)
             {
+                if (currentFunction == FunctionType.INITIALIZER)
+                {
+                    Lox.Error(stmt.keyword, "Can't return a value from an initializer.");
+                }
+
                 Resolve(stmt.value);
             }
 
@@ -244,6 +259,54 @@ namespace jclox
             Resolve(function.body);
             EndScope();
             currentFunction = enclosingFunction;
+        }
+
+        public object VisitClassStmt(Class<object> stmt)
+        {
+            ClassType enclosingClass = currentClass;
+            currentClass = ClassType.CLASS;
+
+            Declare(stmt.name);
+            Define(stmt.name);
+
+            BeginScope();
+            scopes.Peek()["this"] = true;
+
+            foreach (Function<object> method in stmt.methods)
+            {
+                FunctionType declaration = FunctionType.METHOD;
+                ResolveFunction(method, declaration);
+            }
+
+            EndScope();
+
+            currentClass = enclosingClass;
+            return null;
+        }
+
+        public object VisitGetExpr(Get<object> expr)
+        {
+            Resolve(expr.obj);
+            return null;
+        }
+
+        public object VisitSetExpr(Set<object> expr)
+        {
+            Resolve(expr.value);
+            Resolve(expr.obj);
+            return null;
+        }
+
+        public object VisitThisExpr(This<object> expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expr.keyword, "Can't use 'this' outside of a class.");
+                return null;
+            }
+
+            ResolveLocal(expr, expr.keyword);
+            return null;
         }
     }
 }

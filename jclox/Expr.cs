@@ -9,9 +9,12 @@ public interface ExprVisitor<R> {
     R VisitAssignExpr(Assign<R> expr);
     R VisitBinaryExpr(Binary<R> expr);
     R VisitCallExpr(Call<R> expr);
+    R VisitGetExpr(Get<R> expr);
     R VisitGroupingExpr(Grouping<R> expr);
     R VisitLiteralExpr(Literal<R> expr);
     R VisitLogicalExpr(Logical<R> expr);
+    R VisitSetExpr(Set<R> expr);
+    R VisitThisExpr(This<R> expr);
     R VisitUnaryExpr(Unary<R> expr);
     R VisitVariableExpr(Variable<R> expr);
   }
@@ -62,6 +65,20 @@ public class Call<R> : Expr<R> {
     public readonly List<Expr<R>> arguments;
   }
 
+public class Get<R> : Expr<R> {
+    public Get(Expr<R> obj, Token name) {
+        this.obj = obj;
+        this.name = name;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitGetExpr(this);
+    }
+
+    public readonly Expr<R> obj;
+    public readonly Token name;
+  }
+
 public class Grouping<R> : Expr<R> {
     public Grouping(Expr<R> expression) {
         this.expression = expression;
@@ -100,6 +117,34 @@ public class Logical<R> : Expr<R> {
     public readonly Expr<R> left;
     public readonly Token operatorToken;
     public readonly Expr<R> right;
+  }
+
+public class Set<R> : Expr<R> {
+    public Set(Expr<R> obj, Token name, Expr<R> value) {
+        this.obj = obj;
+        this.name = name;
+        this.value = value;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitSetExpr(this);
+    }
+
+    public readonly Expr<R> obj;
+    public readonly Token name;
+    public readonly Expr<R> value;
+  }
+
+public class This<R> : Expr<R> {
+    public This(Token keyword) {
+        this.keyword = keyword;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitThisExpr(this);
+    }
+
+    public readonly Token keyword;
   }
 
 public class Unary<R> : Expr<R> {

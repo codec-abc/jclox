@@ -25,19 +25,6 @@ namespace jclox
                 RunPrompt();
             }
 
-            //Expr<string> expression = new Binary<string>(
-            //    new Unary<string>(
-            //        new Token(TokenType.MINUS, "-", null, 1),
-            //        new Literal<string>(123)
-            //    ),
-            //    new Token(TokenType.STAR, "*", null, 1),
-            //    new Grouping<string>(
-            //        new Literal<string>(45.67)
-            //    )
-            //);
-
-            //Console.WriteLine(new AstPrinter().Print(expression));
-
             return 0;
         }
 
