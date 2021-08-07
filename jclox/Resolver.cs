@@ -144,7 +144,7 @@ namespace jclox
 
             if (scope.ContainsKey(name.lexeme))
             {
-                Lox.Error(name,"Already a variable with this name in this scope.");
+                Lox.Error(name, "Already a variable with this name in this scope.");
             }
 
             scope[name.lexeme] = false;
@@ -157,7 +157,7 @@ namespace jclox
                 return;
             }
 
-            scopes.Peek()[name.lexeme] =  true;
+            scopes.Peek()[name.lexeme] = true;
         }
 
         public object VisitWhileStmt(While<object> stmt)

@@ -109,8 +109,8 @@ namespace jclox
                 case '\n':
                     line++;
                     break;
-                case '"': 
-                    ScanString(); 
+                case '"':
+                    ScanString();
                     break;
 
                 default:
@@ -139,7 +139,7 @@ namespace jclox
 
             string text = source.Substring(start, current - start);
 
-            if (!keywords.ContainsKey(text)) 
+            if (!keywords.ContainsKey(text))
             {
                 AddToken(TokenType.IDENTIFIER);
             }
@@ -201,21 +201,21 @@ namespace jclox
             return source[current + 1];
         }
 
-        private void ScanString() 
+        private void ScanString()
         {
-            while (Peek() != '"' && !IsAtEnd()) 
+            while (Peek() != '"' && !IsAtEnd())
             {
-                if (Peek() == '\n') 
-                { 
-                    line++; 
+                if (Peek() == '\n')
+                {
+                    line++;
                 }
                 Advance();
             }
 
-            if (IsAtEnd()) 
+            if (IsAtEnd())
             {
-              Lox.Error(line, "Unterminated string.");
-              return;
+                Lox.Error(line, "Unterminated string.");
+                return;
             }
 
             // The closing ".
@@ -241,7 +241,7 @@ namespace jclox
             {
                 return false;
             }
-            if (source[current] != expected) 
+            if (source[current] != expected)
             {
                 return false;
             }

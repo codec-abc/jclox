@@ -73,9 +73,9 @@ namespace jclox
                 case TokenType.STAR:
                     CheckNumberOperands(expr.operatorToken, left, right);
                     return (double)left * (double)right;
-                case TokenType.BANG_EQUAL: 
+                case TokenType.BANG_EQUAL:
                     return !IsEqual(left, right);
-                case TokenType.EQUAL_EQUAL: 
+                case TokenType.EQUAL_EQUAL:
                     return IsEqual(left, right);
             }
 
@@ -86,7 +86,8 @@ namespace jclox
         private void CheckNumberOperands(Token operatorToken,
                                    object left, object right)
         {
-            if (left is double && right is double) {
+            if (left is double && right is double)
+            {
                 return;
             }
 
@@ -189,7 +190,7 @@ namespace jclox
                 return "nil";
             }
 
-            if (obj is double) 
+            if (obj is double)
             {
                 string text = obj.ToString();
                 if (text.EndsWith(".0"))
@@ -303,13 +304,13 @@ namespace jclox
         {
             object left = Evaluate(expr.left);
 
-            if (expr.operatorToken.type == TokenType.OR) 
+            if (expr.operatorToken.type == TokenType.OR)
             {
                 if (IsTruthy(left))
                 {
                     return left;
                 }
-            } 
+            }
             else
             {
                 if (!IsTruthy(left))
@@ -340,7 +341,7 @@ namespace jclox
                 arguments.Add(Evaluate(argument));
             }
 
-            if (!(callee is LoxCallable)) 
+            if (!(callee is LoxCallable))
             {
                 throw new RuntimeError(expr.paren, "Can only call functions and classes.");
             }
@@ -380,7 +381,7 @@ namespace jclox
             if (stmt.superclass != null)
             {
                 superclass = Evaluate(stmt.superclass);
-                if (!(superclass is LoxClass)) 
+                if (!(superclass is LoxClass))
                 {
                     throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
                 }
@@ -415,7 +416,7 @@ namespace jclox
         public object VisitGetExpr(Get<object> expr)
         {
             object obj = Evaluate(expr.obj);
-            if (obj is LoxInstance) 
+            if (obj is LoxInstance)
             {
                 LoxInstance loxInstance = ((LoxInstance)obj);
                 return loxInstance.Get(expr.name);
@@ -428,7 +429,7 @@ namespace jclox
         {
             object obj = Evaluate(expr.obj);
 
-            if (!(obj is LoxInstance)) 
+            if (!(obj is LoxInstance))
             {
                 throw new RuntimeError(expr.name, "Only instances have fields.");
             }

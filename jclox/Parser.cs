@@ -41,12 +41,12 @@ namespace jclox
                 Token equals = Previous();
                 Expr<R> value = Assignment();
 
-                if (expr is Variable<R>) 
+                if (expr is Variable<R>)
                 {
                     Token name = ((Variable<R>)expr).name;
                     return new Assign<R>(name, value);
                 }
-                else if (expr is Get<R>) 
+                else if (expr is Get<R>)
                 {
                     Get<R> get = (Get<R>)expr;
                     return new Set<R>(get.obj, get.name, value);
@@ -76,7 +76,7 @@ namespace jclox
         {
             Expr<R> expr = Equality();
 
-            while (Match(new TokenType[] { TokenType.AND } ))
+            while (Match(new TokenType[] { TokenType.AND }))
             {
                 Token operatorToken = Previous();
                 Expr<R> right = Equality();
@@ -207,7 +207,7 @@ namespace jclox
                 return WhileStatement();
             }
 
-            if (Match(new TokenType[] { TokenType.LEFT_BRACE } ))
+            if (Match(new TokenType[] { TokenType.LEFT_BRACE }))
             {
                 return new Block<R>(Block());
             }
@@ -264,10 +264,10 @@ namespace jclox
 
             if (increment != null)
             {
-                body = 
+                body =
                     new Block<R>
                     (
-                        new List<Stmt<R>>() 
+                        new List<Stmt<R>>()
                         {
                             body,
                             new Expression<R>(increment)
@@ -275,9 +275,9 @@ namespace jclox
                     );
             }
 
-            if (condition == null) 
-            { 
-                condition = new Literal<R>(true); 
+            if (condition == null)
+            {
+                condition = new Literal<R>(true);
             }
 
             body = new While<R>(condition, body);
@@ -422,7 +422,7 @@ namespace jclox
                 {
                     expr = FinishCall(expr);
                 }
-                else if (Match(new TokenType[] { TokenType.DOT } ))
+                else if (Match(new TokenType[] { TokenType.DOT }))
                 {
                     Token name = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
                     expr = new Get<R>(expr, name);
@@ -460,14 +460,14 @@ namespace jclox
 
         private Expr<R> Primary()
         {
-            if (Match(new TokenType[] { TokenType.FALSE })) 
-            { 
-                return new Literal<R>(false); 
+            if (Match(new TokenType[] { TokenType.FALSE }))
+            {
+                return new Literal<R>(false);
             }
 
-            if (Match(new TokenType[] { TokenType.TRUE })) 
-            { 
-                return new Literal<R>(true); 
+            if (Match(new TokenType[] { TokenType.TRUE }))
+            {
+                return new Literal<R>(true);
             }
 
             if (Match(new TokenType[] { TokenType.NIL }))
@@ -541,9 +541,9 @@ namespace jclox
 
         private Token Advance()
         {
-            if (!IsAtEnd()) 
-            { 
-                current++; 
+            if (!IsAtEnd())
+            {
+                current++;
             }
             return Previous();
         }
@@ -597,11 +597,11 @@ namespace jclox
             }
         }
 
-        private class ParseError : Exception 
-        { 
+        private class ParseError : Exception
+        {
         }
 
     }
 
-    
+
 }

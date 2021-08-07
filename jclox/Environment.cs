@@ -32,7 +32,7 @@ namespace jclox
             if (ancestor.values.ContainsKey(name))
             {
                 return ancestor.values[name];
-            } 
+            }
             else
             {
                 return null;

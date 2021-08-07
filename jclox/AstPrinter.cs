@@ -72,7 +72,7 @@ namespace jclox
 
         public string VisitVariableExpr(Variable<string> expr)
         {
-            return "(var " + expr.name + ")"; 
+            return "(var " + expr.name + ")";
         }
 
         private string Parenthesize(string name, Expr<string>[] exprs)
