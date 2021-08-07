@@ -9,10 +9,12 @@ namespace jclox
     public class LoxClass : LoxCallable
     {
         public readonly string name;
+        public readonly LoxClass superclass;
         private readonly Dictionary<string, LoxFunction> methods;
 
-        public LoxClass(string name, Dictionary<string, LoxFunction> methods)
+        public LoxClass(string name, LoxClass superclass, Dictionary<string, LoxFunction> methods)
         {
+            this.superclass = superclass;
             this.name = name;
             this.methods = methods;
         }
@@ -45,6 +47,11 @@ namespace jclox
             if (methods.ContainsKey(name))
             {
                 return methods[name];
+            }
+
+            if (superclass != null)
+            {
+                return superclass.FindMethod(name);
             }
 
             return null;

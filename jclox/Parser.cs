@@ -117,6 +117,14 @@ namespace jclox
         private Stmt<R> ClassDeclaration()
         {
             Token name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+
+            Variable<R> superclass = null;
+            if (Match(new TokenType[] { TokenType.LESS }))
+            {
+                Consume(TokenType.IDENTIFIER, "Expect superclass name.");
+                superclass = new Variable<R>(Previous());
+            }
+
             Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
             List<Function<R>> methods = new List<Function<R>>();
@@ -127,7 +135,7 @@ namespace jclox
 
             Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
 
-            return new Class<R>(name, methods);
+            return new Class<R>(name, superclass, methods);
         }
 
         private Function<R> Function(string kind)
@@ -470,6 +478,14 @@ namespace jclox
             if (Match(new TokenType[] { TokenType.NUMBER, TokenType.STRING }))
             {
                 return new Literal<R>(Previous().literal);
+            }
+
+            if (Match(new TokenType[] { TokenType.SUPER }))
+            {
+                Token keyword = Previous();
+                Consume(TokenType.DOT, "Expect '.' after 'super'.");
+                Token method = Consume(TokenType.IDENTIFIER, "Expect superclass method name.");
+                return new Super<R>(keyword, method);
             }
 
             if (Match(new TokenType[] { TokenType.THIS }))

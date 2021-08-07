@@ -27,6 +27,7 @@ namespace AstGenerator
                   "Literal  : object value",
                   "Logical  : Expr<R> left, Token operatorToken, Expr<R> right",
                   "Set      : Expr<R> obj, Token name, Expr<R> value",
+                  "Super    : Token keyword, Token method",
                   "This     : Token keyword",
                   "Unary    : Token operatorToken, Expr<R> right",
                   "Variable : Token name"
@@ -38,7 +39,7 @@ namespace AstGenerator
                 "Stmt", 
                 new List<string> {
                     "Block      : List<Stmt<R>> statements",
-                    "Class      : Token name, List<Function<R>> methods",
+                    "Class      : Token name, Variable<R> superclass, List<Function<R>> methods",
                     "Expression : Expr<R> expression",
                     "Function   : Token name, List<Token> funcParams, List<Stmt<R>> body",
                     "If         : Expr<R> condition, Stmt<R> thenBranch, Stmt<R> elseBranch",

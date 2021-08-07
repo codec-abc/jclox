@@ -23,7 +23,8 @@ namespace jclox
         private enum ClassType
         {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         }
 
         private ClassType currentClass = ClassType.NONE;
@@ -269,6 +270,23 @@ namespace jclox
             Declare(stmt.name);
             Define(stmt.name);
 
+            if (stmt.superclass != null && stmt.name.lexeme == stmt.superclass.name.lexeme)
+            {
+                Lox.Error(stmt.superclass.name, "A class can't inherit from itself.");
+            }
+
+            if (stmt.superclass != null)
+            {
+                currentClass = ClassType.SUBCLASS;
+                Resolve(stmt.superclass);
+            }
+
+            if (stmt.superclass != null)
+            {
+                BeginScope();
+                scopes.Peek()["super"] = true;
+            }
+
             BeginScope();
             scopes.Peek()["this"] = true;
 
@@ -279,6 +297,11 @@ namespace jclox
             }
 
             EndScope();
+
+            if (stmt.superclass != null)
+            {
+                EndScope();
+            }
 
             currentClass = enclosingClass;
             return null;
@@ -303,6 +326,21 @@ namespace jclox
             {
                 Lox.Error(expr.keyword, "Can't use 'this' outside of a class.");
                 return null;
+            }
+
+            ResolveLocal(expr, expr.keyword);
+            return null;
+        }
+
+        public object VisitSuperExpr(Super<object> expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expr.keyword, "Can't use 'super' outside of a class.");
+            }
+            else if (currentClass != ClassType.SUBCLASS)
+            {
+                Lox.Error(expr.keyword, "Can't use 'super' in a class with no superclass.");
             }
 
             ResolveLocal(expr, expr.keyword);

@@ -55,6 +55,11 @@ namespace jclox
             throw new NotImplementedException();
         }
 
+        public string VisitSuperExpr(Super<string> expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitThisExpr(This<string> expr)
         {
             throw new NotImplementedException();

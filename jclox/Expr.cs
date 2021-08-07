@@ -14,6 +14,7 @@ public interface ExprVisitor<R> {
     R VisitLiteralExpr(Literal<R> expr);
     R VisitLogicalExpr(Logical<R> expr);
     R VisitSetExpr(Set<R> expr);
+    R VisitSuperExpr(Super<R> expr);
     R VisitThisExpr(This<R> expr);
     R VisitUnaryExpr(Unary<R> expr);
     R VisitVariableExpr(Variable<R> expr);
@@ -133,6 +134,20 @@ public class Set<R> : Expr<R> {
     public readonly Expr<R> obj;
     public readonly Token name;
     public readonly Expr<R> value;
+  }
+
+public class Super<R> : Expr<R> {
+    public Super(Token keyword, Token method) {
+        this.keyword = keyword;
+        this.method = method;
+    }
+
+    public override R Accept(ExprVisitor<R> visitor) {
+        return visitor.VisitSuperExpr(this);
+    }
+
+    public readonly Token keyword;
+    public readonly Token method;
   }
 
 public class This<R> : Expr<R> {

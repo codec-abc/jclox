@@ -30,8 +30,9 @@ public class Block<R> : Stmt<R> {
   }
 
 public class Class<R> : Stmt<R> {
-    public Class(Token name, List<Function<R>> methods) {
+    public Class(Token name, Variable<R> superclass, List<Function<R>> methods) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 
@@ -40,6 +41,7 @@ public class Class<R> : Stmt<R> {
     }
 
     public readonly Token name;
+    public readonly Variable<R> superclass;
     public readonly List<Function<R>> methods;
   }
 
