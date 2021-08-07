@@ -179,7 +179,7 @@ namespace jclox
 
         public void Resolve(Expr<object> expr, int depth)
         {
-            locals.Add(expr, depth);
+            locals[expr] = depth;
         }
 
         private string Stringify(object obj)
@@ -234,7 +234,6 @@ namespace jclox
 
         private object LookUpVariable(Token name, Expr<object> expr)
         {
-            
             if (locals.ContainsKey(expr))
             {
                 int distance = locals[expr];

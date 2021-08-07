@@ -2,7 +2,7 @@
   "profiles": {
     "jclox": {
       "commandName": "Project",
-      "commandLineArgs": "test1.jclox",
+      "commandLineArgs": "test2.jclox",
       "workingDirectory": "Q:\\dev2\\craftingInterpreter\\jclox\\tests"
     }
   }

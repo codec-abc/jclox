@@ -23,15 +23,17 @@ namespace jclox
 
         public void Define(string name, object value)
         {
-            values.Add(name, value);
+            values[name] = value;
         }
 
         public object GetAt(int distance, string name)
         {
-            if (Ancestor(distance).values.ContainsKey(name))
+            var ancestor = Ancestor(distance);
+            if (ancestor.values.ContainsKey(name))
             {
-                return Ancestor(distance).values[name];
-            } else
+                return ancestor.values[name];
+            } 
+            else
             {
                 return null;
             }
@@ -82,7 +84,7 @@ namespace jclox
 
         public void AssignAt(int distance, Token name, object value)
         {
-            Ancestor(distance).values.Add(name.lexeme, value);
+            Ancestor(distance).values[name.lexeme] = value;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace jclox
 
         private void BeginScope()
         {
-            scopes.Push(new Dictionary<String, Boolean>());
+            scopes.Push(new Dictionary<string, bool>());
         }
 
         private void EndScope()
@@ -131,7 +131,7 @@ namespace jclox
                 Lox.Error(name,"Already a variable with this name in this scope.");
             }
 
-            scope.Add(name.lexeme, false);
+            scope[name.lexeme] = false;
         }
 
         private void Define(Token name)
@@ -220,11 +220,11 @@ namespace jclox
         private void ResolveLocal(Expr<object> expr, Token name)
         {
             var allScopes = scopes.ToArray();
-            for (int i = scopes.Count - 1; i >= 0; i--)
+            for (int i = 0; i < scopes.Count; i++)
             {
                 if (allScopes[i].ContainsKey(name.lexeme))
                 {
-                    interpreter.Resolve(expr, scopes.Count - 1 - i);
+                    interpreter.Resolve(expr, i);
                     return;
                 }
             }
